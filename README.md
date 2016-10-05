@@ -13,8 +13,15 @@ Clone `sqlcipher` in the sqlocker folder.
 ```
 $ git clone https://github.com/sqlcipher/sqlcipher.git 
 $ cd sqlcipher
+
+#ubuntu
 $ ./configure --enable-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC" \
     LDFLAGS="-lcrypto"
+
+#macos
+$ ./configure --enable-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC" \
+	LDFLAGS="/usr/local/opt/openssl/lib/libcrypto.a"
+
 $ make
 ```
 # Use

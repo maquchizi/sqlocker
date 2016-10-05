@@ -42,11 +42,11 @@ read_password () {
     if [[ -z ${service} || ${service} == "all" ]] ; then
         enter_password "Enter password to unlock ${DATABASE}:"
         printf "\n\n"
-        sqlcipher ${DATABASE} -line -header "PRAGMA key = \"${password}\"; SELECT * FROM credentials;"
+        sqlcipher ${DATABASE} -column -header ".width 20 40 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials;"
     else
        enter_password "Enter password to unlock ${DATABASE}:"
        printf "\n\n"
-       sqlcipher ${DATABASE} -line -header "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";"
+       sqlcipher ${DATABASE} -column -header ".width 20 40 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";"
    fi
 }
 

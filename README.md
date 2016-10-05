@@ -9,7 +9,7 @@ Allows for easy curation of passwords by service. The encrypted database file ca
 
 Requires `sqlcipher` build and install it from [source](https://github.com/sqlcipher/sqlcipher.git) using these commands
 ```
-$ git clone https://github.com/sqlcipher/sqlcipher.git && cd sqlcipher
+$ git clone https://github.com/sqlcipher/sqlcipher.git && cd sqlcipher-master
 
 $ ./configure --enable-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC" \
     LDFLAGS="-lcrypto"

@@ -5,12 +5,14 @@ Allows for easy curation of passwords by service. The encrypted database file ca
 
 # Installation
 
-	$ git clone https://github.com/maquchizi/sqlocker.git && cd sqlocker
+	$ git clone https://github.com/maquchizi/sqlocker.git
+	$ cd sqlocker
 
-Requires `sqlcipher` build and install it from [source](https://github.com/sqlcipher/sqlcipher.git) using these commands
+Requires `sqlcipher` build and install it from [source](https://github.com/sqlcipher/sqlcipher.git).
+Clone `sqlcipher` in the sqlocker folder.
 ```
-$ git clone https://github.com/sqlcipher/sqlcipher.git && cd sqlcipher-master
-
+$ git clone https://github.com/sqlcipher/sqlcipher.git 
+$ cd sqlcipher
 $ ./configure --enable-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC" \
     LDFLAGS="-lcrypto"
 $ make

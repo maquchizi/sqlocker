@@ -20,6 +20,14 @@ error () {
     exit 1
 }
 
+goodbye () {
+    printf "\n\n"
+    read -n 1 -p "Press any key to exit the script" action
+    echo -en "\ec"
+}
+
+trap goodbye EXIT
+
 # Read and obfuscate any passwords entered on the script
 enter_password () {
     password=''

@@ -28,13 +28,15 @@ $ make
 
 ## Create a new database file
 
-To create a new database file (or run the script for the first time), run `./sqlocker.sh name-of-new-encrypted-database.db`
+To create a new database file (or run the script for the first time), run `./sqlocker.sh name-of-encrypted-database.db` or just `./sqlocker.sh`
 
-The `.db` file will be created in your current directory and locked with the password you provide. That's it. You can now use your new database.
+If you don't provide a name for your database file, the script will create the default `sqlocker.db` file for you
+
+The `.db` file will be created in the sqlocker directory and locked with the password you provide. That's it. You can now use your new database.
 
 ## Working with an existing database file
 
-Run the script with `./sqlocker.sh name-of-encrypted-database.db`
+Run the script with `./sqlocker.sh name-of-encrypted-database.db` or just `./sqlocker.sh` to use the default database
 
 These commands are case insensitive
 

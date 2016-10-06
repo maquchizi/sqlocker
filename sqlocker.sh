@@ -1,8 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
+SQLOCKERDIRECTORY=$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )
+cd "$SQLOCKERDIRECTORY"
+
 DATABASE=$1
 
-set -euf -o pipefail
+# Default to a database named sqlocker.db
+if [ -z ${1} ] ; then
+    DATABASE="sqlocker.db"
+else
+    DATABASE=$1
+fi
 
+set -euf -o pipefail
 sqlcipher=$(command -v sqlcipher)
 
 error () {
@@ -42,11 +51,11 @@ read_password () {
     if [[ -z ${service} || ${service} == "all" ]] ; then
         enter_password "Enter password to unlock ${DATABASE}:"
         printf "\n\n"
-        sqlcipher ${DATABASE} -column -header ".width 20 40 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials;"
+        sqlcipher ${DATABASE} -column -header ".width 20 30 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials;"
     else
        enter_password "Enter password to unlock ${DATABASE}:"
        printf "\n\n"
-       sqlcipher ${DATABASE} -column -header ".width 20 40 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";"
+       sqlcipher ${DATABASE} -column -header ".width 20 30 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";"
    fi
 }
 
@@ -83,7 +92,7 @@ delete_credentials () {
         enter_password "Enter password to unlock ${DATABASE}:"
         printf "\n\n"
         sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; DELETE FROM credentials WHERE service=\"${service}\";"
-        echo "${service} Credentials Created"
+        echo "${service} Credentials Deleted"
     fi
 }
 

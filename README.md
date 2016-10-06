@@ -47,8 +47,20 @@ These commands are case insensitive
 * Type *d* to delete credentials. You will be prompted for a *Service*
 
 After each of these commands, you will be prompted for the database password. Enter the correct password to unlock the database and run operations on it.
-The database is automatically encrypted after each operation and is never available in its unencrypted form. 
+The database is automatically encrypted after each operation and is never available in its unencrypted form.
+
+# Extra bits
+
+If you're on a Debian(ish) distro, you can add an alias to your *~/.bashrc* file so that you can run the script from anywhere.
+
+Something like: **alias sqlocker="/path/to/sqlocker/folder/./sqlocker.sh"**
+
+You might need to:
+```$ source ~/.bashrc```
+
+Now you can run this from anywhere on your system using:
+```$ sqlocker```
 
 #Inspiration
 
-The project was inspired in part by [pwd.sh](https://github.com/drduh/pwd.sh)
+This project was inspired in part by [pwd.sh](https://github.com/drduh/pwd.sh)

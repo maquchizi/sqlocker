@@ -24,6 +24,7 @@ error () {
 enter_password () {
     password=''
     prompt="${1}"
+    password_type="${2}"
     while IFS= read -p "${prompt}" -r -s -n 1 char ; do
         # If you hit "Enter"
         if [[ ${char} == $'\0' ]] ; then
@@ -45,15 +46,19 @@ enter_password () {
     if [[ -z ${password} ]] ; then
         error "No password provided"
     fi
+    
+    if [[ -n ${password_type} && ${password_type} == 'database' ]] ; then
+        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; SELECT count(*) FROM sqlite_master;" &> /dev/null || error "Incorrect password"
+    fi
 }
 
 read_password () {
     if [[ -z ${service} || ${service} == "all" ]] ; then
-        enter_password "Enter password to unlock ${DATABASE}:"
+        enter_password "Enter password to unlock ${DATABASE}:" "database"
         printf "\n\n"
         sqlcipher ${DATABASE} -column -header ".width 20 30 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials;"
     else
-       enter_password "Enter password to unlock ${DATABASE}:"
+       enter_password "Enter password to unlock ${DATABASE}:" "database"
        printf "\n\n"
        sqlcipher ${DATABASE} -column -header ".width 20 30 40;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";"
    fi
@@ -65,21 +70,21 @@ create_credentials () {
     read -p "
     Username: " username 
     enter_password "
-    Enter password for \"${service}\": " ; echo
-    providedpassword=$password
+    Enter password for \"${service}\": " "service"; echo
+    provided_password=$password
 }
 
 save_credentials () {
-    enter_password "Enter password to unlock ${DATABASE}:"
+    enter_password "Enter password to unlock ${DATABASE}:" "database"
     printf "\n\n"
     result=$(sqlcipher ${DATABASE} -line "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";")
 
     # If the service entered already exists in the DB, update the record else create a new record
     if [[ "${result}" =~ ([${service}]) ]] ; then
-        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; UPDATE credentials SET username = '${username}', password = '${providedpassword}' WHERE service = '${service}';"
+        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; UPDATE credentials SET username = '${username}', password = '${provided_password}' WHERE service = '${service}';"
         echo "${service} Credentials Updated"
     else
-        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; INSERT INTO credentials values('${service}','${username}','${providedpassword}');"
+        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; INSERT INTO credentials values('${service}','${username}','${provided_password}');"
         echo "${service} Credentials Created"
     fi
 }
@@ -89,7 +94,7 @@ delete_credentials () {
     if [ -z ${service} ] ; then
         error "No service was selected"
     else
-        enter_password "Enter password to unlock ${DATABASE}:"
+        enter_password "Enter password to unlock ${DATABASE}:" "database"
         printf "\n\n"
         sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; DELETE FROM credentials WHERE service=\"${service}\";"
         echo "${service} Credentials Deleted"
@@ -97,7 +102,7 @@ delete_credentials () {
 }
 
 create_database () {
-    enter_password "Enter password for ${DATABASE}:"
+    enter_password "Enter password for ${DATABASE}:" "database"
     printf "\n\n"
     sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; CREATE TABLE credentials(service text,username text,password text);"
     echo "Creating Database..."

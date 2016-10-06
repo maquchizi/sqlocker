@@ -3,6 +3,8 @@ Shell script for managing usernames and passwords locally using an encrypted SQL
 
 Allows for easy curation of passwords by service. The encrypted database file can be transfered between computers and will still work.
 
+![image](http://i.imgur.com/dUCxCZv.png)
+
 # Installation
 
 	$ git clone https://github.com/maquchizi/sqlocker.git

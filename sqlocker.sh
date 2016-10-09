@@ -2,13 +2,13 @@
 SQLOCKERDIRECTORY=$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )
 cd "$SQLOCKERDIRECTORY"
 
-DATABASE=$1
+DATABASE="${1}"
 
 # Default to a database named sqlocker.db
 if [ -z ${1} ] ; then
     DATABASE="sqlocker.db"
 else
-    DATABASE=$1
+    DATABASE="${1}"
 fi
 
 set -euf -o pipefail
@@ -30,9 +30,16 @@ trap goodbye EXIT
 
 # Read and obfuscate any passwords entered on the script
 enter_password () {
+    max_attempts=3
     password=''
     prompt="${1}"
-    password_type="${2}"
+    password_type=${2}
+    attempt_number=${3}
+
+    if [[ ${attempt_number} -gt ${max_attempts} ]] ; then
+        error "Incorrect password. Attempts exhausted."
+    fi
+
     while IFS= read -p "${prompt}" -r -s -n 1 char ; do
         # If you hit "Enter"
         if [[ ${char} == $'\0' ]] ; then
@@ -56,17 +63,19 @@ enter_password () {
     fi
     
     if [[ -n ${password_type} && ${password_type} == 'database' ]] ; then
-        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; SELECT count(*) FROM sqlite_master;" &> /dev/null || error "Incorrect password"
+        ((attempt_number++))
+        attempts_left=$((max_attempts-attempt_number))
+        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; SELECT count(*) FROM sqlite_master;" &> /dev/null | printf "\n" || enter_password "Incorrect password. ${attempts_left} attempts left:" "database" "${attempt_number}"
     fi
 }
 
 read_password () {
     if [[ -z ${service} || ${service} == "all" ]] ; then
-        enter_password "Enter password to unlock ${DATABASE}:" "database"
+        enter_password "Enter password to unlock ${DATABASE}:" "database" "1"
         printf "\n\n"
         sqlcipher ${DATABASE} -column -header ".width 30 30 30;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials;"
     else
-       enter_password "Enter password to unlock ${DATABASE}:" "database"
+       enter_password "Enter password to unlock ${DATABASE}:" "database" "1"
        printf "\n\n"
        sqlcipher ${DATABASE} -column -header ".width 30 30 30;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";"
    fi
@@ -78,12 +87,12 @@ create_credentials () {
     read -p "
     Username: " username 
     enter_password "
-    Enter password for \"${service}\": " "service"; echo
+    Enter password for \"${service}\": " "service" "1"; echo
     provided_password=$password
 }
 
 save_credentials () {
-    enter_password "Enter password to unlock ${DATABASE}:" "database"
+    enter_password "Enter password to unlock ${DATABASE}:" "database" "1"
     printf "\n\n"
     result=$(sqlcipher ${DATABASE} -line "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";")
 
@@ -102,7 +111,7 @@ delete_credentials () {
     if [ -z ${service} ] ; then
         error "No service was selected"
     else
-        enter_password "Enter password to unlock ${DATABASE}:" "database"
+        enter_password "Enter password to unlock ${DATABASE}:" "database" "1"
         printf "\n\n"
         sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; DELETE FROM credentials WHERE service=\"${service}\";"
         echo "${service} Credentials Deleted"
@@ -110,7 +119,7 @@ delete_credentials () {
 }
 
 create_database () {
-    enter_password "Enter password for ${DATABASE}:" "database"
+    enter_password "Enter password for ${DATABASE}:" "database" "1"
     printf "\n\n"
     sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; CREATE TABLE credentials(service text,username text,password text);"
     echo "Creating Database..."
@@ -139,13 +148,13 @@ init () {
     fi
 
     # If the database name was not provided
-    if [ -z ${DATABASE} ] ; then
+    if [[ -z ${DATABASE} ]] ; then
         echo "Please select a credentials database"
         exit 1
     fi
 
     # If the database name was provided but is not present in the current directory
-    if [ ! -f ${DATABASE} ] ; then
+    if [[ ! -f ${DATABASE} ]] ; then
         read -n 1 -p "Database doesn't exists. Should I create it for you? (y/n) " action
         printf "\n"
         if [[ "${action}" =~ ^([yY])$ ]] ; then

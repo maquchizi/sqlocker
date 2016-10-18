@@ -77,7 +77,7 @@ read_password () {
     else
        enter_password "Enter password to unlock ${DATABASE}:" "database" "1"
        printf "\n\n"
-       sqlcipher ${DATABASE} -column -header ".width 30 30 30;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\";"
+       sqlcipher ${DATABASE} -column -header ".width 30 30 30;" "PRAGMA key = \"${password}\"; SELECT * FROM credentials WHERE service=\"${service}\" COLLATE NOCASE;"
    fi
 }
 
@@ -113,7 +113,7 @@ delete_credentials () {
     else
         enter_password "Enter password to unlock ${DATABASE}:" "database" "1"
         printf "\n\n"
-        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; DELETE FROM credentials WHERE service=\"${service}\";"
+        sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; DELETE FROM credentials WHERE service=\"${service}\" COLLATE NOCASE;"
         echo "${service} Credentials Deleted"
     fi
 }

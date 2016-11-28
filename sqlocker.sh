@@ -16,14 +16,14 @@ sqlcipher=$(command -v sqlcipher)
 
 error () {
     printf "\n\n"
-    echo -e "\e[31mError: ${1}\e[0m"
+    printf "\e[31mError: ${1}\e[0m"
     exit 1
 }
 
 goodbye () {
     printf "\n\n"
     read -n 1 -p "Press any key to exit the script" action
-    echo -en "\ec"
+    printf "\ec"
 }
 
 trap goodbye EXIT

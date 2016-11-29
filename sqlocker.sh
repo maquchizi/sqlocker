@@ -87,7 +87,7 @@ create_credentials () {
     read -p "
     Username: " username 
     enter_password "
-    Enter password for \"${service}\": " "service" "1"; echo
+    Enter password for \"${service}\": " "service" "1"; printf "\n\n"
     provided_password=$password
 }
 
@@ -99,10 +99,10 @@ save_credentials () {
     # If the service entered already exists in the DB, update the record else create a new record
     if [[ "${result}" =~ ([${service}]) ]] ; then
         sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; UPDATE credentials SET username = '${username}', password = '${provided_password}' WHERE service = '${service}';"
-        echo "${service} Credentials Updated"
+        printf "${service} Credentials Updated"
     else
         sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; INSERT INTO credentials values('${service}','${username}','${provided_password}');"
-        echo "${service} Credentials Created"
+        printf "${service} Credentials Created"
     fi
 }
 
@@ -114,7 +114,7 @@ delete_credentials () {
         enter_password "Enter password to unlock ${DATABASE}:" "database" "1"
         printf "\n\n"
         sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; DELETE FROM credentials WHERE service=\"${service}\" COLLATE NOCASE;"
-        echo "${service} Credentials Deleted"
+        printf "${service} Credentials Deleted"
     fi
 }
 
@@ -122,13 +122,13 @@ create_database () {
     enter_password "Enter password for ${DATABASE}:" "database" "1"
     printf "\n\n"
     sqlcipher ${DATABASE} "PRAGMA key = \"${password}\"; CREATE TABLE credentials(service text,username text,password text);"
-    echo "Creating Database..."
-    echo "Done"
+    printf "Creating Database..."
+    printf "Done"
     main
 }
 
 main () {
-    echo -n -e "\e[4mC\e[0mreate, \e[4mR\e[0mead, \e[4mU\e[0mpdate or \e[4mD\e[0melete credentials? (c/r/u/d, default: r) "
+    printf "\e[4mC\e[0mreate, \e[4mR\e[0mead, \e[4mU\e[0mpdate or \e[4mD\e[0melete credentials? (c/r/u/d, default: r) "
     read -n 1 action
     printf "\n"
 
@@ -149,7 +149,7 @@ init () {
 
     # If the database name was not provided
     if [[ -z ${DATABASE} ]] ; then
-        echo "Please select a credentials database"
+        printf "Please select a credentials database"
         exit 1
     fi
 
@@ -160,7 +160,7 @@ init () {
         if [[ "${action}" =~ ^([yY])$ ]] ; then
             create_database
         else
-            echo "Okay. Bye."
+            printf "Okay. Bye."
             exit 1
         fi
     else

@@ -23,6 +23,12 @@ error () {
 goodbye () {
     printf "\n\n"
     read -n 1 -p "Press any key to exit the script" action
+    # Trying to keep all your juicy credentials safe
+    # by preventing people from just scrolling up and seeing them all
+    
+    # Clear scrollback buffer on OSX
+    clear && printf '\e[3J'
+    # Clear scrollback buffer on Debian flavoured linux
     printf "\ec"
 }
 

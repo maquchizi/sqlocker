@@ -33,6 +33,7 @@ goodbye () {
 }
 
 trap goodbye EXIT
+trap '' INT
 
 # Read and obfuscate any passwords entered on the script
 enter_password () {
